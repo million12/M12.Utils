@@ -1,0 +1,11 @@
+# WrapRemover implementation
+#
+# Used as processor, removes <div class="[wrapperClass]">...</div> element
+# from the processed NodeType (eg. content collection, text element etc)
+#
+prototype(M12.Utils:WrapRemover) {
+	@class = 'M12\\Utils\\TypoScript\\WrapRemoverImplementation'
+	node = ${node}
+	value = ${value}
+	wrapperClass = null
+}
