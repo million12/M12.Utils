@@ -101,7 +101,7 @@ class WrapRemoverImplementation extends AbstractTypoScriptObject {
 	}
 
 	/**
-	 * Remove extra DIV wrapper, if it contains only default CSS class
+	 * Remove extra DIV wrapper, if it contains only the default CSS class
 	 * set in wrapperClass TS variable.
 	 *
 	 * @param string $content
@@ -109,19 +109,24 @@ class WrapRemoverImplementation extends AbstractTypoScriptObject {
 	 * @return string
 	 */
 	public function removeWrapper($content, $wrapperClass) {
-		$content = preg_replace('#^<div class="'.$wrapperClass.'">(.+?)</div>$#ms', '$1', trim($content));
+		// Do not proceed if the wrapper class is not present in the content
+		if (false === strstr($content, $wrapperClass)) {
+			return $content;
+		}
+
+		$content = preg_replace('#^<div class="'.$wrapperClass.'">(.*)</div>$#ms', '$1', trim($content));
 
 		// In development context add extra HTML comments with info, what is what
 		if ($this->isDevelopmentEnvironment() && ($contentCollectionNode = $this->getContentCollectionNode())) {
 			// ContentCollection: add context path info around it
 			if (strstr($wrapperClass, 'contentcollection')) {
 				$contextPath = $contentCollectionNode->getContextPath();
-				$content = "<!-- content-collection START: $contextPath -->" . trim($content) . "<!-- content-collection END: $contextPath -->";
+				$content = "<!-- content collection START: $contextPath -->" . $content . "<!-- content collection END: $contextPath -->";
 			}
 			// Other NodeTypes: add node element name
 			elseif (($node = $this->getNode())) {
 				$nodeType = $node->getNodeType()->getName();
-				$content  = "<!-- $nodeType -->" . trim($content) . "<!-- /$nodeType -->";
+				$content  = "<!-- $nodeType -->" . $content . "<!-- /$nodeType -->";
 			}
 		}
 
