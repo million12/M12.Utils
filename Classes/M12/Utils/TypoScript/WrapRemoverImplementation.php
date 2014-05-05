@@ -97,7 +97,7 @@ class WrapRemoverImplementation extends AbstractTypoScriptObject {
 			return $content;
 		}
 
-		return $this->removeWrapper($content, $wrapperClass);
+		return $this->removeWrapper($content, 'div', $wrapperClass);
 	}
 
 	/**
@@ -105,16 +105,29 @@ class WrapRemoverImplementation extends AbstractTypoScriptObject {
 	 * set in wrapperClass TS variable.
 	 *
 	 * @param string $content
+	 * @param string $wrapperTag
 	 * @param string $wrapperClass
 	 * @return string
 	 */
-	public function removeWrapper($content, $wrapperClass) {
-		// Do not proceed if the wrapper class is not present in the content
-		if (false === strstr($content, $wrapperClass)) {
+	public function removeWrapper($content, $wrapperTag, $wrapperClass) {
+		// Trim content from the white characters, so we can spot the wrapper
+		// starting exactly from the beginning.
+		$content = trim($content);
+
+		// wrapper strings start && end
+		$wrap = array(
+			"<$wrapperTag class=\"$wrapperClass\">",
+			"</$wrapperTag>",
+		);
+
+		// Only proceed if wrapper is found exactly at the beginning of the content
+		if (0 !== strpos($content, $wrap[0])) {
 			return $content;
 		}
 
-		$content = preg_replace('#^<div class="'.$wrapperClass.'">(.*)</div>$#ms', '$1', trim($content));
+		$start  = strlen($wrap[0]);
+		$length = strlen($content) - $start - strlen($wrap[1]);
+		$content = substr($content, $start, $length);
 
 		// In development context add extra HTML comments with info, what is what
 		if ($this->isDevelopmentEnvironment() && ($contentCollectionNode = $this->getContentCollectionNode())) {
