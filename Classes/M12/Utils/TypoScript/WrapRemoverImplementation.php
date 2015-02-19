@@ -53,7 +53,7 @@ class WrapRemoverImplementation extends AbstractTypoScriptObject {
 	 */
 	public function getContentCollectionNode() {
 		$currentContext = $this->tsRuntime->getCurrentContext();
-		return $currentContext['contentCollectionNode'];
+		return $currentContext['node'];
 	}
 
 	/**
